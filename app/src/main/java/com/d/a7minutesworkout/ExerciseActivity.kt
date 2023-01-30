@@ -44,27 +44,44 @@ class ExerciseActivity : AppCompatActivity() {
         binding?.flExerciseView?.visibility = View.INVISIBLE
         binding?.tvExerciseName?.visibility = View.INVISIBLE
         binding?.ivImage?.visibility = View.INVISIBLE
+        binding?.tvUpComingLabel?.visibility = View.VISIBLE
+        binding?.tvUpcomingExerciseName?.visibility = View.VISIBLE
+
 
         if(restTimer != null){
             restTimer?.cancel()
             restProgress = 0
         }
+        binding?.tvUpcomingExerciseName?.text =
+            exerciseList!![currentExercisePosition +1].getName()
         setRestProgressBar()
     }
-    private fun setupExerciseView(){
+    private fun setupExerciseView() {
+// TODO (Step 4- changing the upcoming exercise label and name visibility.)
+        // Here according to the view make it visible as this is Exercise View so exercise view is visible and rest view is not.
         binding?.flRestView?.visibility = View.INVISIBLE
-
         binding?.tvTitle?.visibility = View.INVISIBLE
-        binding?.flExerciseView?.visibility = View.VISIBLE
+        binding?.tvUpcomingExerciseName?.visibility = View.INVISIBLE
+        binding?.tvUpComingLabel?.visibility = View.INVISIBLE
         binding?.tvExerciseName?.visibility = View.VISIBLE
+        binding?.flExerciseView?.visibility = View.VISIBLE
         binding?.ivImage?.visibility = View.VISIBLE
-        if(exerciseTimer != null){
+
+
+
+        if (exerciseTimer != null) {
             exerciseTimer?.cancel()
-            exerciseProgress=0
+            exerciseProgress = 0
         }
+
+        // Setting up the current exercise name and imageview to the UI element.
+        // START
+
         binding?.ivImage?.setImageResource(exerciseList!![currentExercisePosition].getImage())
         binding?.tvExerciseName?.text = exerciseList!![currentExercisePosition].getName()
-            setExerciseProgressBar()
+        // END
+        setExerciseProgressBar()
+
     }
     private fun setRestProgressBar(){
         binding?.progressBar?.progress = restProgress

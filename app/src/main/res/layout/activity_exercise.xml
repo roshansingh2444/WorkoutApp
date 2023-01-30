@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".ExerciseActivity">
-    <!--TODO(Step 4 - Adding a toolbar to display a title)-->
-    <!--Step 4 START-->
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarExercise"
         android:layout_width="match_parent"
@@ -16,6 +16,7 @@
         android:theme="@style/ToolbarTheme"
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@color/colorPrimary" />
+
 
     <TextView
         android:id="@+id/tvTitle"
@@ -29,18 +30,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!--TODO(Step 6 - Adding a view for the Get Ready Screen with a progress bar and remaining time text for the timer.)-->
-    <!--Step 6 START-->
     <FrameLayout
         android:id="@+id/flRestView"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/item_circular_color_accent_border"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarExercise">
+        app:layout_constraintTop_toBottomOf="@id/toolbarExercise"
+        tools:visibility="visible">
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -72,17 +73,48 @@
                 tools:text="10" />
         </LinearLayout>
     </FrameLayout>
-    
+
+    <!--TODO (Step 1 - Showing the upcoming exercise name in the Get Ready For View.)-->
+    <!--START-->
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/flRestView"
+        android:id="@+id/tvUpComingLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@id/tvUpcomingExerciseName"
+        android:text="UPCOMING EXERCISE : "
+        android:textSize="16sp" />
+
+    <TextView
+        app:layout_constraintTop_toBottomOf="@id/tvUpComingLabel"
+        android:id="@+id/tvUpcomingExerciseName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="5dp"
+        android:textColor="#212121"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        tools:text="Exercise Name" />
+    <!--END-->
+    <!-- First add the images to the Drawable folder and adding an imageview to show which is the current exercise along with the Name-->
     <ImageView
         android:id="@+id/ivImage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:contentDescription="@string/image"
         android:scaleType="fitXY"
         android:src="@drawable/ic_jumping_jacks"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/tvExerciseName"
-        app:layout_constraintTop_toBottomOf="@id/toolbarExercise"/>
+        app:layout_constraintTop_toBottomOf="@id/toolbarExercise" />
 
+    <!--  We also add a textView for ExerciseName and position it below the imageview-->
     <TextView
         android:id="@+id/tvExerciseName"
         android:layout_width="wrap_content"
@@ -95,21 +127,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivImage"
-        tools:visibility="visible"/>
-
-
+        tools:visibility="visible" />
+    <!-- We also need to change the position of this frame layout to be below the tvExercise-->
     <FrameLayout
         android:id="@+id/flExerciseView"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="10dp"
-        android:visibility="gone"
-        tools:visibility="visible"
         android:background="@drawable/item_circular_color_accent_border"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvExerciseName">
+        app:layout_constraintTop_toBottomOf="@id/tvExerciseName"
+        tools:visibility="visible">
 
         <ProgressBar
             android:id="@+id/progressBarExercise"
@@ -120,7 +151,7 @@
             android:background="@drawable/circular_progress_gray"
             android:indeterminate="false"
             android:max="30"
-            android:progress="300"
+            android:progress="100"
             android:progressDrawable="@drawable/circular_progress_bar"
             android:rotation="-90" />
 
@@ -138,7 +169,7 @@
                 android:textColor="#FFFFFF"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                tools:text="30" />
+                tools:text="10" />
         </LinearLayout>
     </FrameLayout>
 
