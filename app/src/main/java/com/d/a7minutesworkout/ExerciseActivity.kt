@@ -3,11 +3,16 @@ package com.d.a7minutesworkout
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.d.a7minutesworkout.databinding.ActivityExerciseBinding
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.log
 
-class ExerciseActivity : AppCompatActivity() {
+class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var binding: ActivityExerciseBinding? = null
 
     private var restTimer: CountDownTimer? = null
@@ -19,6 +24,9 @@ class ExerciseActivity : AppCompatActivity() {
     private var exerciseList : ArrayList<ExerciseModel>? = null
     private var currentExercisePosition = -1
 
+    private var exerciseTimerDuration:Long = 30
+
+    private var tts : TextToSpeech? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExerciseBinding.inflate(layoutInflater)
@@ -31,6 +39,8 @@ class ExerciseActivity : AppCompatActivity() {
         }
 
         exerciseList = Constants.defaultExerciseList()
+
+        tts = TextToSpeech(this,this)
 
         binding?.toolbarExercise?.setNavigationOnClickListener {
             onBackPressed()
@@ -74,6 +84,8 @@ class ExerciseActivity : AppCompatActivity() {
             exerciseProgress = 0
         }
 
+        speakOut(exerciseList!![currentExercisePosition].getName())
+
         // Setting up the current exercise name and imageview to the UI element.
         // START
 
@@ -86,44 +98,50 @@ class ExerciseActivity : AppCompatActivity() {
     private fun setRestProgressBar(){
         binding?.progressBar?.progress = restProgress
 
-        restTimer = object: CountDownTimer(10000,1000){
+        restTimer = object : CountDownTimer(10000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                restProgress++
-                binding?.progressBar?.progress = 10 - restProgress
-                binding?.tvTimer?.text = (10 - restProgress).toString()
+                restProgress++ // It is increased by 1
+                binding?.progressBar?.progress = 10 - restProgress // Indicates progress bar progress
+                binding?.tvTimer?.text =
+                    (10 - restProgress).toString()  // Current progress is set to text view in terms of seconds.
             }
 
             override fun onFinish() {
-              currentExercisePosition ++
-              setupExerciseView()
+                // When the 10 seconds will complete this will be executed.
+                currentExercisePosition++
+                setupExerciseView()
             }
-
         }.start()
     }
 
-    private fun setExerciseProgressBar(){
+    private fun setExerciseProgressBar() {
+
         binding?.progressBarExercise?.progress = exerciseProgress
 
-        restTimer = object: CountDownTimer(30000,1000){
+        exerciseTimer = object : CountDownTimer(exerciseTimerDuration * 1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 exerciseProgress++
-                binding?.progressBarExercise?.progress = 30 - exerciseProgress
-                binding?.tvTimerExercise?.text = (30 - exerciseProgress).toString()
+                binding?.progressBarExercise?.progress = exerciseTimerDuration.toInt() - exerciseProgress
+                binding?.tvTimerExercise?.text = (exerciseTimerDuration.toInt() - exerciseProgress).toString()
             }
 
             override fun onFinish() {
-               if (currentExercisePosition <exerciseList?.size!!-1){
-                   setupRestView()
-               }else{
-                   Toast.makeText(
-                       this@ExerciseActivity,
-                       "Congrats for finishing the exercise",
-                        Toast.LENGTH_SHORT
-                   ).show()
-               }
-            }
+                // Updating the view after completing the 30 seconds exercise
+                // START
+                if (currentExercisePosition < exerciseList?.size!! - 1) {
+                    setupRestView()
+                } else {
 
+                    Toast.makeText(
+                        this@ExerciseActivity,
+                        "Congratulations! You have completed the 7 minutes workout.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                // END
+            }
         }.start()
+
     }
 
     override fun onDestroy() {
@@ -137,8 +155,29 @@ class ExerciseActivity : AppCompatActivity() {
             exerciseTimer?.cancel()
             exerciseProgress = 0
         }
+        if (tts != null){
+            tts!!.stop()
+            tts!!.shutdown()
+        }
 
         binding = null
+    }
+
+    override fun onInit(status: Int) {
+       if (status == TextToSpeech.SUCCESS){
+           val result = tts?.setLanguage(Locale.US)
+
+           if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+               Log.e("tts","The language is not supported")
+
+           }else {
+               Log.e("Tts","Initialization failed")
+           }
+       }
+    }
+
+    private fun speakOut(text: String){
+        tts!!.speak(text,TextToSpeech.QUEUE_FLUSH,null,"")
     }
 
 }
