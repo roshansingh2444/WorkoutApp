@@ -1,12 +1,13 @@
 package com.d.a7minutesworkout
 
-class ExerciseModel (
-    private var id : Int,
+class ExerciseModel(
+    private var id: Int,
     private var name: String,
     private var image: Int,
-    private var isCompleted: Boolean = false,
-    private var isSelected: Boolean = false
-    ){
+    private var isCompleted: Boolean,
+    private var isSelected: Boolean
+) {
+
     fun getId(): Int {
         return id
     }
