@@ -1,5 +1,6 @@
 package com.d.a7minutesworkout
 
+import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +26,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var restProgress =
         0 // Variable for timer progress. As initial value the rest progress is set to 0. As we are about to start.
     //END
+    private var restTimerDuration: Long = 1
 
 
     // Adding a variables for the 30 seconds Exercise timer
@@ -32,7 +34,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var exerciseTimer: CountDownTimer? = null // Variable for Exercise Timer and later on we will initialize it.
     private var exerciseProgress = 0 // Variable for the exercise timer progress. As initial value the exercise progress is set to 0. As we are about to start.
     // END
-    private var exerciseTimerDuration:Long = 30
+    private var exerciseTimerDuration:Long = 1
     // The Variable for the exercise list and current position of exercise here it is -1 as the list starting element is 0
     // START
     private var exerciseList: ArrayList<ExerciseModel>? = null // We will initialize the list later.
@@ -122,7 +124,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
          *   {#onTick(long)} callbacks.
          */
         // Here we have started a timer of 10 seconds so the 10000 is milliseconds is 10 seconds and the countdown interval is 1 second so it 1000.
-        restTimer = object : CountDownTimer(10000, 1000) {
+        restTimer = object : CountDownTimer(restTimerDuration*10000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 restProgress++ // It is increased by 1
                 binding?.progressBar?.progress = 10 - restProgress // Indicates progress bar progress
@@ -187,21 +189,21 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
                 // TODO(Step 2 : We have changed the status of the selected item and updated the status of that, so that the position is set as completed in the exercise list.)
                 // START
-                exerciseList!![currentExercisePosition].setIsSelected(false) // exercise is completed so selection is set to false
-                exerciseList!![currentExercisePosition].setIsCompleted(true) // updating in the list that this exercise is completed
-                exerciseAdapter!!.notifyDataSetChanged() // Notifying the adapter class.
+
                 // END
                 // Updating the view after completing the 30 seconds exercise
                 // START
                 if (currentExercisePosition < exerciseList?.size!! - 1) {
+                    exerciseList!![currentExercisePosition].setIsSelected(false) // exercise is completed so selection is set to false
+                    exerciseList!![currentExercisePosition].setIsCompleted(true) // updating in the list that this exercise is completed
+                    exerciseAdapter!!.notifyDataSetChanged() // Notifying the adapter class.
                     setupRestView()
                 } else {
+                    finish()
+                    val intent = Intent(this@ExerciseActivity, FinishActivity::class.java)
+                    startActivity(intent)
 
-                    Toast.makeText(
-                        this@ExerciseActivity,
-                        "Congratulations! You have completed the 7 minutes workout.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                 }
                 // END
             }
