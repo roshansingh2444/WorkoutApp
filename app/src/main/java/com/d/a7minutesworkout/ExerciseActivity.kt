@@ -1,5 +1,6 @@
 package com.d.a7minutesworkout
 
+import android.app.Dialog
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
@@ -13,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.d.a7minutesworkout.databinding.ActivityExerciseBinding
+import com.d.a7minutesworkout.databinding.DialogCustomBackConfirmationBinding
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.log
@@ -26,7 +28,6 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var restProgress =
         0 // Variable for timer progress. As initial value the rest progress is set to 0. As we are about to start.
     //END
-    private var restTimerDuration: Long = 1
 
 
     // Adding a variables for the 30 seconds Exercise timer
@@ -34,33 +35,41 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private var exerciseTimer: CountDownTimer? = null // Variable for Exercise Timer and later on we will initialize it.
     private var exerciseProgress = 0 // Variable for the exercise timer progress. As initial value the exercise progress is set to 0. As we are about to start.
     // END
-    private var exerciseTimerDuration:Long = 1
+    private var exerciseTimerDuration:Long = 30
     // The Variable for the exercise list and current position of exercise here it is -1 as the list starting element is 0
     // START
     private var exerciseList: ArrayList<ExerciseModel>? = null // We will initialize the list later.
     private var currentExercisePosition = -1 // Current Position of Exercise.
+
     private var binding:ActivityExerciseBinding? = null
     private var tts: TextToSpeech? = null // Variable for Text to Speech
     private var player: MediaPlayer? = null
     private var exerciseAdapter: ExerciseStatusAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//inflate the layout
         binding = ActivityExerciseBinding.inflate(layoutInflater)
+// pass in binding?.root in the content view
         setContentView(binding?.root)
+// then set support action bar and get toolBarExercise using the binding
+//variable
         setSupportActionBar(binding?.toolbarExercise)
 
         if (supportActionBar != null){
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
         binding?.toolbarExercise?.setNavigationOnClickListener {
-            onBackPressed()
+            //TODO(Step 3 : Calling the function of custom dialog for back button confirmation which we have created in step 2.)
+            customDialogForBackButton()
         }
 
         tts = TextToSpeech(this, this)
+
         exerciseList = Constants.defaultExerciseList()
-        // END
+
         setupRestView()
         setupExerciseStatusRecyclerView()
+
     }
 
 
@@ -70,7 +79,6 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
      * Function is used to set the timer for REST.
      */
     private fun setupRestView() {
-
         try {
             val soundURI =
                 Uri.parse("android.resource://eu.tutorials.a7_minutesworkoutapp/" + R.raw.press_start)
@@ -109,22 +117,14 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     // Setting up the 10 seconds timer for rest view and updating it continuously.
     //START
-    /**
-     * Function is used to set the progress of timer using the progress
-     */
+
     private fun setRestProgressBar() {
 
         binding?.progressBar?.progress = restProgress // Sets the current progress to the specified value.
 
-        /**
-         * @param millisInFuture The number of millis in the future from the call
-         *   to {#start()} until the countdown is done and {#onFinish()}
-         *   is called.
-         * @param countDownInterval The interval along the way to receive
-         *   {#onTick(long)} callbacks.
-         */
+
         // Here we have started a timer of 10 seconds so the 10000 is milliseconds is 10 seconds and the countdown interval is 1 second so it 1000.
-        restTimer = object : CountDownTimer(restTimerDuration*10000, 1000) {
+        restTimer = object : CountDownTimer(10000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 restProgress++ // It is increased by 1
                 binding?.progressBar?.progress = 10 - restProgress // Indicates progress bar progress
@@ -133,14 +133,10 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
 
             override fun onFinish() {
-                // When the 10 seconds will complete this will be executed.
                 currentExercisePosition++
-
-                // TODO(Step 1 : When we are getting an updated position of exercise set that item in the list as selected and notify the adapter class.)
-                // START
                 exerciseList!![currentExercisePosition].setIsSelected(true) // Current Item is selected
                 exerciseAdapter!!.notifyDataSetChanged() // Notified the current item to adapter class to reflect it into UI.
-                // END
+
                 setupExerciseView()
             }
         }.start()
@@ -162,18 +158,32 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         binding?.flExerciseView?.visibility = View.VISIBLE
         binding?.ivImage?.visibility = View.VISIBLE
 
+        /**
+         * Here firstly we will check if the timer is running and it is not null then cancel the running timer and start the new one.
+         * And set the progress to the initial value which is 0.
+         */
         if (exerciseTimer != null) {
             exerciseTimer?.cancel()
             exerciseProgress = 0
         }
         speakOut(exerciseList!![currentExercisePosition].getName())
-
+        /**
+         * Here current exercise name and image is set to exercise view.
+         */
         binding?.ivImage?.setImageResource(exerciseList!![currentExercisePosition].getImage())
         binding?.tvExerciseName?.text = exerciseList!![currentExercisePosition].getName()
+        // END
         setExerciseProgressBar()
 
     }
+    // END
 
+
+    // After REST View Setting up the 30 seconds timer for the Exercise view and updating it continuously
+    // START
+    /**
+     * Function is used to set the progress of the timer using the progress for Exercise View for 30 Seconds
+     */
     private fun setExerciseProgressBar() {
 
         binding?.progressBarExercise?.progress = exerciseProgress
@@ -187,23 +197,15 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
             override fun onFinish() {
 
-                // TODO(Step 2 : We have changed the status of the selected item and updated the status of that, so that the position is set as completed in the exercise list.)
-                // START
-
-                // END
-                // Updating the view after completing the 30 seconds exercise
-                // START
                 if (currentExercisePosition < exerciseList?.size!! - 1) {
                     exerciseList!![currentExercisePosition].setIsSelected(false) // exercise is completed so selection is set to false
                     exerciseList!![currentExercisePosition].setIsCompleted(true) // updating in the list that this exercise is completed
-                    exerciseAdapter!!.notifyDataSetChanged() // Notifying the adapter class.
+                    exerciseAdapter?.notifyDataSetChanged()
                     setupRestView()
                 } else {
                     finish()
-                    val intent = Intent(this@ExerciseActivity, FinishActivity::class.java)
+                    val intent = Intent(this@ExerciseActivity,FinishActivity::class.java)
                     startActivity(intent)
-
-
                 }
                 // END
             }
@@ -234,12 +236,18 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         if(player != null){
             player!!.stop()
         }
+
         super.onDestroy()
         binding = null
     }
 
+    // START
+    /**
+     * This the TextToSpeech override function
+     *
+     * Called to signal the completion of the TextToSpeech engine initialization.
+     */
     override fun onInit(status: Int) {
-
         if (status == TextToSpeech.SUCCESS) {
             // set US English as language for tts
             val result = tts?.setLanguage(Locale.US)
@@ -251,7 +259,6 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         } else {
             Log.e("TTS", "Initialization Failed!")
         }
-
     }
 
     private fun speakOut(text: String) {
@@ -259,9 +266,44 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun setupExerciseStatusRecyclerView() {
+
+        // Defining a layout manager for the recycle view
+        // Here we have used a LinearLayout Manager with horizontal scroll.
         binding?.rvExerciseStatus?.layoutManager =
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        // As the adapter expects the exercises list and context so initialize it passing it.
         exerciseAdapter = ExerciseStatusAdapter(exerciseList!!)
+
+        // Adapter class is attached to recycler view
         binding?.rvExerciseStatus?.adapter = exerciseAdapter
     }
+    // END
+
+    /**
+     * Function is used to launch the custom confirmation dialog.
+     */
+
+    private fun customDialogForBackButton() {
+        val customDialog = Dialog(this)
+
+        val dialogBinding = DialogCustomBackConfirmationBinding.inflate(layoutInflater)
+        /*Set the screen content from a layout resource.
+         The resource will be inflated, adding all top-level views to the screen.*/
+
+        customDialog.setContentView(dialogBinding.root)
+
+        customDialog.setCanceledOnTouchOutside(false)
+        dialogBinding.tvYes.setOnClickListener {
+            
+            this@ExerciseActivity.finish()
+            customDialog.dismiss() // Dialog will be dismissed
+        }
+        dialogBinding.tvNo.setOnClickListener {
+            customDialog.dismiss()
+        }
+        //Start the dialog and display it on screen.
+        customDialog.show()
+    }
+    // END
 }
