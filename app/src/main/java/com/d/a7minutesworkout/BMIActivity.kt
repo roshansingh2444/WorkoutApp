@@ -8,6 +8,7 @@ class BMIActivity : AppCompatActivity() {
     private var binding: ActivityBmiBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityBmiBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
         setSupportActionBar(binding?.toolbarBmiActivity)
