@@ -59,7 +59,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
         binding?.toolbarExercise?.setNavigationOnClickListener {
-            //TODO(Step 3 : Calling the function of custom dialog for back button confirmation which we have created in step 2.)
+
             customDialogForBackButton()
         }
 
@@ -295,7 +295,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         customDialog.setCanceledOnTouchOutside(false)
         dialogBinding.tvYes.setOnClickListener {
-            
+
             this@ExerciseActivity.finish()
             customDialog.dismiss() // Dialog will be dismissed
         }
