@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.d.a7minutesworkout.databinding.ActivityBmiBinding
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class BMIActivity : AppCompatActivity() {
     private var binding: ActivityBmiBinding? = null
@@ -27,6 +29,7 @@ class BMIActivity : AppCompatActivity() {
 
                 val weightValue : Float = binding?.etMetricUnitWeight?.text.toString().toFloat()
                  val bmi = weightValue / (heightValue*heightValue)
+                displayBMIResult(bmi)
             }else{
                 Toast.makeText(this@BMIActivity,"Please enter  valid values.",Toast.LENGTH_SHORT)
                     .show()
@@ -70,9 +73,13 @@ class BMIActivity : AppCompatActivity() {
             bmiDescription = "sigh"
         }
 
+        val bmiValue = BigDecimal(bmi.toDouble()).setScale(2,RoundingMode.HALF_EVEN).toString()
 
         binding?.llDisplayBMIResult?.visibility = View.VISIBLE
-        
+        binding?.tvBMIValue?.text = bmiValue
+        binding?.tvBMIType?.text = bmiLabel
+        binding?.tvBMIDescription?.text = bmiDescription
+
 
     }
 
