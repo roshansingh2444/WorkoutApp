@@ -7,7 +7,7 @@ import android.widget.Toast
 import com.d.a7minutesworkout.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-
+    //  The binding is name just like the name of the layout with Binding attached
     private var binding:ActivityMainBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,15 +18,22 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this,ExerciseActivity::class.java)
             startActivity(intent)
         }
-        binding?.flBMI?.setOnClickListener{
-            val intent = Intent(this,BMIActivity::class.java)
-            startActivity(intent)
-        }
-        binding?.flHistory?.setOnClickListener{
-            val intent = Intent(this,HistoryActivity::class.java)
+
+        binding?.flBMI?.setOnClickListener {
+            // Launching the BMI Activity
+            val intent = Intent(this, BMIActivity::class.java)
             startActivity(intent)
         }
 
+
+        //  Adding a click event to launch the History Screen Activity from Main Activity.)
+        // START
+        binding?.flHistory?.setOnClickListener {
+            // Launching the History Activity
+            val intent = Intent(this, HistoryActivity::class.java)
+            startActivity(intent)
+        }
+        //END
     }
 
 

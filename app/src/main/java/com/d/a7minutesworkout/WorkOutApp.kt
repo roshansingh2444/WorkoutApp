@@ -1,9 +1,10 @@
 package com.d.a7minutesworkout
 
 import android.app.Application
+// create the application class
+class WorkOutApp: Application() {
 
-class WorkOutApp : Application () {
-    val db by lazy {
+    val db:HistoryDatabase by lazy {
         HistoryDatabase.getInstance(this)
     }
 }
